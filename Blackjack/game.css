@@ -1,0 +1,53 @@
+body {
+    background-image: url(images/background/table.jpg);
+    background-size: cover;
+    color: white;
+    text-align: center;
+    
+    
+}
+
+h1 {
+    font-size: 50px;
+    font-weight: bold;
+    color: yellow;
+}
+p {
+    font-size: 25px;
+}
+
+
+button{
+    width: 400px;
+    height: 60px;
+    font-size: 25px;
+    display: block;
+    margin: 20px auto;
+
+}
+#card-list {
+
+    height:270px;
+    margin: 0 auto;
+}
+#card-lists {
+    padding: 0;
+}
+img{
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    overflow: hidden;
+    margin: 0 5px;
+}
+ul {
+    list-style-type: none;
+
+    overflow: hidden;
+}
+li{
+    display: inline-block;
+    text-decoration: none;
+
+}
+
