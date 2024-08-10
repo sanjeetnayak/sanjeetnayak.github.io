@@ -126,7 +126,8 @@ h1 {
     padding: 8px 20px;
 }
 .containor {
-    display: flex;
+  flex-direction:column;
+  display: flex;
 }
 h3 {
     margin: 5px 20px;
