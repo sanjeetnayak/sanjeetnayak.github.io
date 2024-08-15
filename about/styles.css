@@ -209,7 +209,7 @@ h1 {
 
 
 
-*:focus {
+.social>a button:focus {
   outline: 0 !important;
   box-shadow: 2px 10px 50px rgb(95, 95, 95);
 
