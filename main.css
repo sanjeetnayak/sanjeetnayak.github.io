@@ -1,4 +1,4 @@
-html {
+html>body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   background-image: url('images/background.svg');
@@ -7,12 +7,26 @@ html {
 }
 
 body {
-    background: linear-gradient(120deg, rgb(132, 250, 176) 0%, rgb(143, 211, 244) 100%)fixed;
-    color: #333333;
-    margin-top: 5rem;
-  }
-  
-h1, h2, h3, h4, h5, h6 {
+
+  margin-top: 4rem;
+}
+
+
+.card {
+  box-shadow: 0px 0px 11px 2px rgba(0, 0, 0, 0.45);
+  border-radius: 10px;
+  margin: 10px;
+  width: 100%;
+  overflow: hidden;
+
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: #444444;
 }
 
@@ -20,8 +34,23 @@ ul {
   margin: 0;
 }
 
+.col-sm-2andhalf {
+  position: relative;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+@media (min-width:576px) {
+  .col-sm-2andhalf {
+    -ms-flex: 0 0 22%;
+    flex: 0 0 22%;
+    max-width: 22%
+  }
+}
+
 .bg-steel {
-  background-color:#363636;
+  background-color: #363636;
 }
 
 .site-header .navbar-nav .nav-link {
@@ -35,6 +64,14 @@ ul {
 .site-header .navbar-nav .nav-link.active {
   font-weight: 500;
 }
+.bg-fp {
+  background-image: url(https://media.licdn.com/dms/image/v2/C4D16AQFAXToYO_eztQ/profile-displaybackgroundimage-shrink_200_800/profile-displaybackgroundimage-shrink_200_800/0/1653738491467?e=1744243200&v=beta&t=Q1zw2RBWUd8ZNi0Rkc_kB049mV9vyryri2U90ZxIQaQ);
+  height: 50px;
+}
+.fa{
+  width: 15px;
+  text-align: center;
+}
 
 .content-section {
   background: #ffffff;
@@ -43,9 +80,26 @@ ul {
   border-radius: 3px;
   margin-bottom: 20px;
 }
+.hero-fp{
+  width: 72px;
+  height: 72px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid var(--color-border-on-dark);
+}
 
 .article-title {
   color: #444444;
+}
+
+.containers {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+}
+.container {
+  padding: 0;
 }
 
 a.article-title:hover {
@@ -94,6 +148,3 @@ a.article-title:hover {
 .input-group-append {
   width: 136px;
 }
-
-
-
