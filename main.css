@@ -34,15 +34,15 @@ ul {
   margin: 0;
 }
 
-.col-sm-2andhalf {
+.col-md-2andhalf {
   position: relative;
   width: 100%;
   padding-left: 15px;
   padding-right: 15px;
 }
 
-@media (min-width:576px) {
-  .col-sm-2andhalf {
+@media (min-width:992px) {
+  .col-md-2andhalf {
     -ms-flex: 0 0 22%;
     flex: 0 0 22%;
     max-width: 22%
