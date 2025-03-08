@@ -203,14 +203,14 @@ $(document).ready(function(){
       }, 1000);
     });
 
-    fetch("https://webcalc-api.herokuapp.com/calc/");
+    fetch("https://webcalc-backend.onrender.com/calc/");
     $('#myform').on('submit', function (e) {
 
       forMdata = {"vel":$("#inputVel").val(), "dia":$("#inputDia").val(), "hl":$("#inputHead").val(), "flowrate":$("#inputFlow").val()};
       var formData = JSON.stringify(forMdata);
       e.preventDefault();
       $.ajax({
-         url: 'https://webcalc-api.herokuapp.com/calc/',
+         url: 'https://webcalc-backend.onrender.com/calc/',
          contentType: false,
          data: formData,
          type: 'post',
@@ -291,7 +291,7 @@ $(document).ready(function(){
       forMdata = {"vel":$("#inputVel").val(), "dia":$("#inputDia").val(), "hl":$("#inputHead").val(), "flowrate":$("#inputFlow").val(), "dw":$("#inlineFormInput-1").val(), "dh":$("#inlineFormInput-2").val()};
       var formData = JSON.stringify(forMdata);
       $.ajax({
-        url: 'https://webcalc-api.herokuapp.com/calc/',
+        url: 'https://webcalc-backend.onrender.com/calc/',
         contentType: false,
         data: formData,
         type: 'post',
