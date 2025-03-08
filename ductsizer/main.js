@@ -297,7 +297,6 @@ $(document).ready(function(){
         type: 'post',
         success: function (response) {
           // $('.table').show();
-          console.log("yes");
           $("#rn").text(response.rn.toFixed(0));
           $("#ff").text(response.ff.toFixed(4));
           $("#fv").text(response.fv.toFixed(2));
