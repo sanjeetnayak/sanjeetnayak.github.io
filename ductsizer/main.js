@@ -1,4 +1,6 @@
 $(document).ready(function(){
+  // Comment out once Cronjobs fails// fetch("https://webcalc-backend.onrender.com/calc/");
+  console.log("yes")
 
     $('.btn-dark').on('click', function (evt) {
       $(".num").val('');
@@ -203,7 +205,7 @@ $(document).ready(function(){
       }, 1000);
     });
 
-    fetch("https://webcalc-backend.onrender.com/calc/");
+
     $('#myform').on('submit', function (e) {
 
       forMdata = {"vel":$("#inputVel").val(), "dia":$("#inputDia").val(), "hl":$("#inputHead").val(), "flowrate":$("#inputFlow").val()};
