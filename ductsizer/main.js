@@ -1,6 +1,5 @@
 $(document).ready(function(){
   // Comment out once Cronjobs fails// fetch("https://webcalc-backend.onrender.com/calc/");
-  console.log("yes")
 
     $('.btn-dark').on('click', function (evt) {
       $(".num").val('');
