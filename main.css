@@ -131,6 +131,7 @@ h1, h2, h3, h4, h5, h6 {
 [data-auth-menu-trigger]:hover {
   color: #ffffff !important;
   border-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.14) !important;
 }
 
 [data-auth-menu] .dropdown-menu {

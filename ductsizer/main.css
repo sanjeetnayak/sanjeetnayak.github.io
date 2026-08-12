@@ -108,6 +108,29 @@ input:checked + .slider:after {
   color: red;
 }
 
+/* Results pane: folded shut on arrival, opens like a page turning once results land */
+.calc-row {
+  perspective: 2000px;
+}
+
+.calc-row .results-pane {
+  transform-origin: left center;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.85s ease;
+}
+
+.calc-row.pane-closed .results-pane {
+  transform: rotateY(-90deg);
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calc-row .results-pane {
+    transition: none;
+  }
+}
+
 /* Error message shown when the calculator service can't answer */
 .calc-alert {
   margin: 14px 0 0;

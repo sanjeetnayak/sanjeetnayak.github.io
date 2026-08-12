@@ -109,9 +109,7 @@
   const NAV_LINKS = [
     { href: '/', label: 'Home' },
     { href: '/about/', label: 'About' },
-    { href: '/ductsizer/', label: 'DuctSizer' },
-    { href: '/Blackjack/', label: 'BlackJack' },
-    { href: '/Tax/', label: 'Tax 2025' }
+    { href: '/ductsizer/', label: 'DuctSizer' }
   ];
 
   function isActiveLink(href, path) {

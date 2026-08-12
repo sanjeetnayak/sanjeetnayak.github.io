@@ -90,6 +90,7 @@ $(document).ready(function(){
       $("#inlineFormInput-1").prop('disabled', true);
       $("#inlineFormInput-2").prop('disabled', true);
       clearCalcAlert();
+      setResultsPane(false);
     });
 
     function showCalcAlert(msg) {
@@ -99,12 +100,18 @@ $(document).ready(function(){
       $('#calc-alert').prop('hidden', true);
     }
 
+    // Fold the results pane shut until a calculation lands.
+    function setResultsPane(open) {
+      $('.calc-row').toggleClass('pane-closed', !open);
+    }
+
     $('.forms').click(function() {
       $('.table').hide();
       $("#inlineFormInput-1").val('');
       $("#inlineFormInput-2").val('');
       $("#inlineFormInput-1").prop('disabled', true);
       $("#inlineFormInput-2").prop('disabled', true);
+      setResultsPane(false);
     });
 
     var delay = (function(){
@@ -151,6 +158,7 @@ $(document).ready(function(){
          success: function (response) {
           clearCalcAlert();
           $('.table').show();
+          setResultsPane(true);
           $("#rn").text(response.rn.toFixed(0));
           $("#ff").text(response.ff.toFixed(4));
           $("#fv").text(response.fv.toFixed(2));
