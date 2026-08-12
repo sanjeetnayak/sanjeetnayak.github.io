@@ -1,53 +1,74 @@
+/* Page-specific styles for BlackJack — the game is deliberately dark, unlike the rest of the site. Shared chrome (nav, type) lives in ../main.css */
+
 body {
-    background-image: url(images/background/table.jpg);
-    background-size: cover;
-    color: white;
-    text-align: center;
-    
-    
+  background-color: #0c1a14;
 }
 
-h1 {
-    font-size: 50px;
-    font-weight: bold;
-    color: yellow;
-}
-p {
-    font-size: 25px;
+.game {
+  max-width: 640px;
+  margin: 80px auto 40px;
+  padding: 32px;
+  text-align: center;
+  color: #f0fdf4;
 }
 
-
-button{
-    width: 400px;
-    height: 60px;
-    font-size: 25px;
-    display: block;
-    margin: 20px auto;
-
+.game h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #f0fdf4;
 }
+
 #card-list {
-
-    height:270px;
-    margin: 0 auto;
+  min-height: 150px;
+  margin: 20px auto;
 }
+
 #card-lists {
-    padding: 0;
-}
-img{
-    width: 60px;
-    height: 90px;
-    object-fit: cover;
-    overflow: hidden;
-    margin: 0 5px;
-}
-ul {
-    list-style-type: none;
-
-    overflow: hidden;
-}
-li{
-    display: inline-block;
-    text-decoration: none;
-
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
+#card-lists li {
+  display: inline-block;
+}
+
+#card-lists img {
+  width: 72px;
+  height: 108px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+#sum,
+#greeting {
+  font-size: 1.15rem;
+}
+
+.game button {
+  min-width: 180px;
+  padding: 10px 22px;
+  margin: 8px 6px;
+  border-radius: 999px;
+  border: 0;
+  font-weight: 600;
+}
+
+#stBtn {
+  background: #0f9d8f;
+  color: #fff;
+}
+
+#newBtn {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+#newBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -13,14 +13,8 @@ document.querySelector("#sum").textContent = "Sum: "
 
 
 function genRand() {
-    let r = Math.floor(Math.random() * (imgs.length-1))
-    let random = imgs[r][0]
-    r= Math.ceil(Math.random() * (imgs.length-1))
-    random = imgs[r]
-
-    imgs.splice(r,1)   
-
-    return random
+    const index = Math.floor(Math.random() * imgs.length)
+    return imgs.splice(index, 1)[0]
 }
 
 function start(){
@@ -61,10 +55,9 @@ function start(){
     [9,"images/hrt/s9.jpg"], 
     [10,"images/hrt/s10.jpg"], 
     [10,"images/hrt/sj.jpg"], 
-    [10,"images/hrt/sq.jpg"], 
-    [10,"images/hrt/sk.jpg"], 
-    [11,"images/hrt/s1.jpg"],
-    [2,"images/spd/p2.jpg"], 
+    [10,"images/hrt/sq.jpg"],
+    [10,"images/hrt/sk.jpg"],
+    [2,"images/spd/p2.jpg"],
     [3,"images/spd/p3.jpg"], 
     [4,"images/spd/p4.jpg"], 
     [5,"images/spd/p5.jpg"], 
@@ -105,9 +98,9 @@ function renderGame(){
         }
         completelist.innerHTML += "<li><img src=\'"+cards[i][1]+"\'></li>"
     }
-    if(sum>21){
-        sum-=aceCounter*10
-
+    while (sum > 21 && aceCounter > 0) {
+        sum -= 10
+        aceCounter -= 1
     }
 
     if (sum<21){

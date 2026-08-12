@@ -1,92 +1,32 @@
-body {
-    background: linear-gradient(120deg, rgb(132, 250, 176) 0%, rgb(143, 211, 244) 100%)fixed;
-    color: #333333;
-    margin-top: 5rem;
-  }
-  
-h1, h2, h3, h4, h5, h6 {
-  color: #444444;
+/* Page-specific styles for DuctSizer — shared chrome (nav, cards, type) lives in ../main.css */
+
+.page-head {
+  padding-top: 24px;
+  margin-bottom: 8px;
 }
 
-ul {
-  margin: 0;
+/* Clear the fixed navbar + give the tool breathing room */
+main.container {
+  padding-top: 28px;
 }
 
-.bg-steel {
-  background-color: #5f788a;
+.page-head h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
 }
 
-.site-header .navbar-nav .nav-link {
-  color: #cbd5db;
-}
-
-.site-header .navbar-nav .nav-link:hover {
-  color: #ffffff;
-}
-
-.site-header .navbar-nav .nav-link.active {
-  font-weight: 500;
-}
-
-.content-section {
-  background: #ffffff;
-  padding: 10px 20px;
-  border: 1px solid #dddddd;
-  border-radius: 3px;
-  margin-bottom: 20px;
-}
-
-.article-title {
-  color: #444444;
-}
-
-a.article-title:hover {
-  color: #428bca;
-  text-decoration: none;
-}
-
-.article-content {
-  white-space: pre-line;
-}
-
-.article-img {
-  height: 65px;
-  width: 65px;
-  margin-right: 16px;
-}
-
-.article-metadata {
-  padding-bottom: 1px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #e3e3e3
-}
-
-.article-metadata a:hover {
-  color: #333;
-  text-decoration: none;
-}
-
-.article-svg {
-  width: 25px;
-  height: 25px;
-  vertical-align: middle;
-}
-
-.account-img {
-  height: 125px;
-  width: 125px;
-  margin-right: 20px;
-  margin-bottom: 16px;
-}
-
-.account-heading {
-  font-size: 2.5rem;
-}
-
+/* Force the unit selects wide enough to read */
 .input-group-append {
   width: 136px;
 }
 
+.input-group-append.vel-unit,
+.input-group-append.dia-unit {
+  width: 110px;
+}
+
+/* SI <-> US toggle switch */
 .switch {
   position: relative;
   display: inline-block;
@@ -94,7 +34,9 @@ a.article-title:hover {
   height: 29px;
 }
 
-.switch input {display:none;}
+.switch input {
+  display: none;
+}
 
 .slider {
   position: absolute;
@@ -103,9 +45,9 @@ a.article-title:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #2ab934;
-  -webkit-transition: .4s;
-  transition: .4s;
+  background-color: var(--accent);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
   border-radius: 29px;
 }
 
@@ -116,54 +58,63 @@ a.article-title:hover {
   width: 22px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+  background-color: #fff;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
   border-radius: 50%;
 }
 
 input:checked + .slider {
-  background-color: #ca2222;
+  background-color: var(--amber);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px var(--accent);
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(22px);
-  -ms-transform: translateX(22px);
+  -webkit-transform: translateX(46px);
+  -ms-transform: translateX(46px);
   transform: translateX(46px);
 }
 
-/*------ ADDED CSS ---------*/
-.slider:after
-{
-content:'SI';
-color: white;
-display: block;
-position: absolute;
-transform: translate(-50%,-50%);
-top: 50%;
-left: 65%;
-/* font-size: 10px; */
-font-family: Verdana, sans-serif;
+.slider:after {
+  content: 'SI';
+  color: #fff;
+  display: block;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 65%;
+  font-size: 10px;
+  font-family: var(--font-mono);
 }
 
-input:checked + .slider:after
-{  
-  content:'US';
+input:checked + .slider:after {
+  content: 'US';
   left: 35%;
 }
-.btn-circle.btn-sm { 
-  width: 30px; 
+
+.btn-circle.btn-sm {
+  width: 30px;
   height: 30px;
-  padding: 3px 4px;  
-  border-radius: 15px; 
+  padding: 3px 4px;
+  border-radius: 15px;
   font-size: 15px;
-  font-weight: bold; 
-} 
-.red-f{
+  font-weight: bold;
+}
+
+.red-f {
   color: red;
 }
 
+/* Error message shown when the calculator service can't answer */
+.calc-alert {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #b3261e;
+  background: rgba(214, 60, 60, 0.1);
+  border: 1px solid rgba(214, 60, 60, 0.35);
+  border-radius: 9px;
+}

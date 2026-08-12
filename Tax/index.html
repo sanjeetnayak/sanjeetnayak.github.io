@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Tax Calculator 2025 | Sanjeet Nayak</title>
+    <meta name="description" content="Estimate your 2025 US federal income tax with a marginal-rate breakdown. Built by Sanjeet Kumar Nayak.">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../main.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="site-header" data-nav-placeholder></header>
+
+    <main class="container page-wrap">
+        <div class="page-head">
+            <p class="eyebrow">Tool · Tax year 2025</p>
+            <h1>US Federal Income Tax Calculator</h1>
+            <p class="page-intro">Enter your taxable income to see your 2025 federal income tax, split across each
+                marginal bracket. Use this to sanity-check a return — not as tax advice.</p>
+        </div>
+
+        <div class="calc-grid">
+            <div class="card calc-card">
+                <form id="tax-form" novalidate>
+                    <label class="field-label" for="filing-status">Filing status</label>
+                    <select class="form-control" id="filing-status">
+                        <option value="single">Single</option>
+                        <option value="mfj">Married filing jointly</option>
+                        <option value="hoh">Head of household</option>
+                        <option value="mfs">Married filing separately</option>
+                    </select>
+
+                    <label class="field-label" for="taxable-income">Taxable income (USD)</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">$</div>
+                        </div>
+                        <input type="number" min="0" step="100" class="form-control" id="taxable-income"
+                            placeholder="e.g. 85000" required>
+                    </div>
+
+                    <div class="calc-actions">
+                        <button type="submit" class="btn btn-primary">Calculate</button>
+                        <button type="button" class="btn btn-outline-secondary" id="tax-reset">Reset</button>
+                    </div>
+                </form>
+
+                <p class="disclaimer">Estimates federal income tax only. It ignores the 2025 standard deduction
+                    (Single $15,000 · MFJ $30,000 · HoH $22,500), credits, and state taxes. Not tax advice.</p>
+            </div>
+
+            <div class="card calc-card results" id="tax-results" hidden>
+                <div class="result-grid">
+                    <div class="result-stat">
+                        <span class="result-label">Estimated tax</span>
+                        <span class="result-value" id="res-tax">$0</span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-label">Marginal rate</span>
+                        <span class="result-value" id="res-marginal">—</span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="result-label">Effective rate</span>
+                        <span class="result-value" id="res-effective">—</span>
+                    </div>
+                </div>
+                <div class="bracket-wrap">
+                    <table class="table table-sm bracket-table">
+                        <thead>
+                            <tr>
+                                <th>Rate</th>
+                                <th>Income range</th>
+                                <th class="num">Tax in bracket</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bracket-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../main.js"></script>
+    <script>
+        const BRACKETS = {
+            single: [
+                { rate: 0.10, to: 11925 }, { rate: 0.12, to: 48475 }, { rate: 0.22, to: 103350 },
+                { rate: 0.24, to: 197300 }, { rate: 0.32, to: 250525 }, { rate: 0.35, to: 626350 },
+                { rate: 0.37, to: Infinity }
+            ],
+            mfj: [
+                { rate: 0.10, to: 23850 }, { rate: 0.12, to: 96950 }, { rate: 0.22, to: 206700 },
+                { rate: 0.24, to: 394600 }, { rate: 0.32, to: 501050 }, { rate: 0.35, to: 751600 },
+                { rate: 0.37, to: Infinity }
+            ],
+            hoh: [
+                { rate: 0.10, to: 17000 }, { rate: 0.12, to: 64850 }, { rate: 0.22, to: 103350 },
+                { rate: 0.24, to: 197300 }, { rate: 0.32, to: 250500 }, { rate: 0.35, to: 626350 },
+                { rate: 0.37, to: Infinity }
+            ],
+            mfs: [
+                { rate: 0.10, to: 11925 }, { rate: 0.12, to: 48475 }, { rate: 0.22, to: 103350 },
+                { rate: 0.24, to: 197300 }, { rate: 0.32, to: 250500 }, { rate: 0.35, to: 375800 },
+                { rate: 0.37, to: Infinity }
+            ]
+        };
+
+        const fmt = (n) => '$' + Math.round(n).toLocaleString('en-US');
+
+        function calculate(income, status) {
+            const brackets = BRACKETS[status];
+            let prev = 0, total = 0, marginal = 0, rows = [];
+            for (const b of brackets) {
+                const lo = prev, hi = Math.min(b.to, income);
+                if (hi > lo) {
+                    const tax = (hi - lo) * b.rate;
+                    total += tax;
+                    marginal = b.rate;
+                    rows.push({ rate: b.rate, lo, hi, tax });
+                }
+                prev = b.to;
+            }
+            return { total, marginal, effective: income > 0 ? total / income : 0, rows };
+        }
+
+        document.getElementById('tax-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const income = parseFloat(document.getElementById('taxable-income').value);
+            if (!isFinite(income) || income < 0) return;
+            const status = document.getElementById('filing-status').value;
+            const r = calculate(income, status);
+            document.getElementById('res-tax').textContent = fmt(r.total);
+            document.getElementById('res-marginal').textContent = Math.round(r.marginal * 100) + '%';
+            document.getElementById('res-effective').textContent = Math.round(r.effective * 100) + '%';
+            const body = document.getElementById('bracket-body');
+            body.innerHTML = '';
+            for (const row of r.rows) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + (row.rate * 100) + '%</td>' +
+                    '<td>' + fmt(row.lo) + ' – ' + fmt(row.hi) + '</td>' +
+                    '<td class="num">' + fmt(row.tax) + '</td>';
+                body.appendChild(tr);
+            }
+            document.getElementById('tax-results').hidden = false;
+        });
+
+        document.getElementById('tax-reset').addEventListener('click', function () {
+            document.getElementById('taxable-income').value = '';
+            document.getElementById('tax-results').hidden = true;
+        });
+    </script>
+</body>
+
+</html>

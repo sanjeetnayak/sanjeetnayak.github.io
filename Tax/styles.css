@@ -1,0 +1,144 @@
+/* Page-specific styles for the Tax Calculator — shared chrome (nav, cards, type, tokens) lives in ../main.css */
+
+.page-wrap {
+  max-width: 900px;
+  padding-top: 24px;
+}
+
+.page-head {
+  margin-bottom: 2rem;
+}
+
+.page-head h1 {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+
+.page-intro {
+  color: var(--muted);
+  font-size: 0.98rem;
+  max-width: 56ch;
+  margin-bottom: 0;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.calc-card {
+  padding: 1.5rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin: 1.1rem 0 0.35rem;
+  display: block;
+}
+
+.field-label:first-child {
+  margin-top: 0;
+}
+
+#filing-status,
+#taxable-income {
+  border-radius: 9px;
+  border-color: var(--line);
+  font-size: 0.95rem;
+}
+
+#filing-status:focus,
+#taxable-income:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(14, 140, 127, 0.15);
+}
+
+.calc-actions {
+  margin-top: 1.4rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.calc-actions .btn-primary,
+.calc-actions .btn-outline-secondary {
+  border-radius: 9px;
+}
+
+.disclaimer {
+  margin: 1.3rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.result-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.result-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.result-value {
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+.bracket-wrap {
+  overflow-x: auto;
+}
+
+.bracket-table {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.bracket-table thead th {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom-color: var(--line);
+}
+
+.bracket-table td {
+  border-color: var(--line);
+}
+
+.bracket-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+}
