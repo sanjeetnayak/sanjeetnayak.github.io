@@ -1,4 +1,22 @@
 $(document).ready(function(){
+    // --- Backend origin + auth header ---
+    // Calc and history both hit this base. Override with
+    // window.CALC_API_BASE_URL to switch environments (local dev vs Render).
+    var CALC_API_BASE = (window.CALC_API_BASE_URL || 'https://webcalc-backend.onrender.com').replace(/\/$/, '');
+
+    // Attach the site-wide token so the server can tie a calc to its user and
+    // record history; without it every request is anonymous and nothing is
+    // saved. DRF wants the `Token` scheme, not `Bearer`.
+    function authHeaders() {
+      var token = readAuthToken();
+      return token ? { 'Authorization': 'Token ' + token } : {};
+    }
+
+    // The last committed history entry. The Calculate button creates a new
+    // one; live width/height adjustments carry this id so the backend amends
+    // the same record instead of saving a new card per keystroke.
+    var currentHistoryId = null;
+
     // --- Clear / reset button ---
     // .btn-dark is the reset control: wipe every numeric quantity input
     // (.num = flow, head, velocity, diameter) plus the rectangular-duct
@@ -125,6 +143,7 @@ $(document).ready(function(){
       $('.table').hide();
       $("#inlineFormInput-1").prop('disabled', true);
       $("#inlineFormInput-2").prop('disabled', true);
+      currentHistoryId = null;
       clearCalcAlert();
       setResultsPane(false);
     });
@@ -254,8 +273,9 @@ $(document).ready(function(){
       }
       var formData = JSON.stringify(forMdata);
       $.ajax({
-         url: 'https://webcalc-backend.onrender.com/calc/',
+         url: CALC_API_BASE + '/calc/',
          contentType: false,
+         headers: authHeaders(),
          data: formData,
          type: 'post',
          success: function (response) {
@@ -283,6 +303,8 @@ $(document).ready(function(){
           $('#inputFlow').val(usVal(response.flowrate_new, 2.118888).toFixed(0));
           $("#inlineFormInput-1").prop('disabled', false);
           $("#inlineFormInput-2").prop('disabled', false);
+          currentHistoryId = response.history_id;
+          loadHistory();
          },
          error: function (response) {
            // Distinguish a backend crash (HTTP 500) from an unreachable
@@ -310,12 +332,14 @@ $(document).ready(function(){
         "hl": toSi($("#inputHead").val(), '.hl-unit', 0.1225, 'in.WC/100 ft'),
         "flowrate": toSi($("#inputFlow").val(), '.flow-unit', 2.118888, 'CFM'),
         "dw": toSiRect($("#inlineFormInput-1").val()),
-        "dh": toSiRect($("#inlineFormInput-2").val())
+        "dh": toSiRect($("#inlineFormInput-2").val()),
+        "history_id": currentHistoryId
       };
       var formData = JSON.stringify(forMdata);
       $.ajax({
-        url: 'https://webcalc-backend.onrender.com/calc/',
+        url: CALC_API_BASE + '/calc/',
         contentType: false,
+        headers: authHeaders(),
         data: formData,
         type: 'post',
         success: function (response) {
@@ -330,6 +354,8 @@ $(document).ready(function(){
           $("#hl").text(usVal(response.hl, 0.1225).toFixed(3));
           $("#fa1").text(usVal(response.fa, 10.7639).toFixed(2));
           $("#inlineFormInput-2").val(usVal(response.dh, 0.0393701).toFixed(0));
+          currentHistoryId = response.history_id;
+          loadHistory();
         },
         error: function () {
           showCalcAlert('The calculator service could not answer — check that the backend is running, then try again.');
@@ -346,12 +372,14 @@ function create_post_5() {
         "hl": toSi($("#inputHead").val(), '.hl-unit', 0.1225, 'in.WC/100 ft'),
         "flowrate": toSi($("#inputFlow").val(), '.flow-unit', 2.118888, 'CFM'),
         "dw": toSiRect($("#inlineFormInput-1").val()),
-        "dh": toSiRect($("#inlineFormInput-2").val())
+        "dh": toSiRect($("#inlineFormInput-2").val()),
+        "history_id": currentHistoryId
       };
       var formData = JSON.stringify(forMdata);
       $.ajax({
-        url: 'https://webcalc-backend.onrender.com/calc/',
+        url: CALC_API_BASE + '/calc/',
         contentType: false,
+        headers: authHeaders(),
         data: formData,
         type: 'post',
         success: function (response) {
@@ -365,6 +393,8 @@ function create_post_5() {
           $("#vp").text(usVal(response.vp, 0.00401865).toFixed(2));
           $("#hl").text(usVal(response.hl, 0.1225).toFixed(3));
           $("#fa1").text(usVal(response.fa, 10.7639).toFixed(2));
+          currentHistoryId = response.history_id;
+          loadHistory();
         },
         error: function () {
           showCalcAlert('The calculator service could not answer — check that the backend is running, then try again.');
@@ -460,4 +490,221 @@ function create_post_5() {
       $(".vp+.unit").text("Pa");
       $(".hl+.unit").text("Pa/m");
     }
+
+    // === Saved calculation history (signed-in users) ===
+    // The backend auto-records every /calc/ for an authenticated user and
+    // serves them from GET /history/ (DRF token auth — the site-wide token in
+    // localStorage, sent as `Token`, not `Bearer`). The newest entries render
+    // as a grid of compact cards below the calculator. Clicking a card opens
+    // the full result in an overlay (dismissed by any click outside it); the
+    // × in a card's corner deletes that entry via DELETE /history/<id>/.
+    var HISTORY_API = CALC_API_BASE + '/history/';
+
+    function readAuthToken() {
+      var storage = (window.AUTH_TOKEN_STORAGE === 'sessionStorage' && window.sessionStorage)
+        ? window.sessionStorage
+        : window.localStorage;
+      return storage.getItem('siteAuthToken');
+    }
+
+    // A stored input only counts as "known" when it carries a real positive
+    // value; unknowns are saved as '' and must not surface on a card.
+    function isKnown(v) {
+      return v !== '' && v !== null && v !== undefined && Number(v) > 0;
+    }
+
+    function fmtNum(n, dp) {
+      return Number(n).toFixed(dp);
+    }
+
+    function fmtTime(iso) {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) { return ''; }
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+      return months[d.getMonth()] + ' ' + d.getDate() + ', ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+
+    // Compact summary of the two known quantities a calc was solved from.
+    function inputsSummary(inputs) {
+      var parts = [];
+      if (isKnown(inputs.flowrate)) { parts.push(fmtNum(inputs.flowrate, 0) + ' L/s'); }
+      if (isKnown(inputs.dia)) { parts.push('Ø' + fmtNum(inputs.dia, 0) + ' mm'); }
+      if (isKnown(inputs.hl)) { parts.push(fmtNum(inputs.hl, 3) + ' Pa/m'); }
+      if (isKnown(inputs.vel)) { parts.push(fmtNum(inputs.vel, 2) + ' m/s'); }
+      return parts.length ? parts.join(' · ') : 'Saved calculation';
+    }
+
+    function historyCardMarkup(entry) {
+      var inputs = entry.inputs || {};
+      var outputs = entry.outputs || {};
+      var isRect = isKnown(inputs.dw);
+      // Rectangular runs lead with the duct W×H; circular runs with the
+      // solved equivalent diameter.
+      var result = isRect
+        ? '<span class="history-card-num">' + fmtNum(inputs.dw, 0) + ' × ' + fmtNum(outputs.dh, 0) + '</span> mm'
+        : '<span class="history-card-num">' + fmtNum(outputs.ed, 1) + '</span> mm eq. dia';
+      var meta = 'Vel ' + fmtNum(outputs.fv, 2) + ' m/s · HL ' + fmtNum(outputs.hl, 3) + ' Pa/m';
+      return '' +
+        '<article class="history-card" tabindex="0" role="button" data-id="' + entry.id +
+          '" aria-label="View calculation details">' +
+          '<button type="button" class="history-card-del" title="Delete" aria-label="Delete this calculation">&times;</button>' +
+          '<span class="history-card-tag">' + (isRect ? 'Rectangular' : 'Circular') + '</span>' +
+          '<div class="history-card-inputs">' + inputsSummary(inputs) + '</div>' +
+          '<div class="history-card-result">' + result + '</div>' +
+          '<div class="history-card-meta">' + meta + '</div>' +
+          '<time class="history-card-time">' + fmtTime(entry.created_at) + '</time>' +
+        '</article>';
+    }
+
+    function renderHistory(entries) {
+      $('#history-section').prop('hidden', false);
+      $('#history-error').prop('hidden', true);
+      $('#history-empty').prop('hidden', !(entries && entries.length === 0));
+      $('#history-note').text(entries && entries.length ? entries.length + ' saved' : '');
+      var grid = $('#history-grid').empty();
+      if (entries) {
+        entries.forEach(function (entry) {
+          grid.append($(historyCardMarkup(entry)).data('entry', entry));
+        });
+      }
+    }
+
+    function showHistoryError(msg) {
+      $('#history-error').text(msg).prop('hidden', false);
+    }
+
+    function hideHistory() {
+      $('#history-section').prop('hidden', true);
+      $('#history-grid').empty();
+      $('#history-note').text('');
+      $('#history-empty').prop('hidden', true);
+      $('#history-error').prop('hidden', true);
+    }
+
+    function loadHistory() {
+      if (!readAuthToken()) { hideHistory(); return; }
+      $('#history-section').prop('hidden', false);
+      $.ajax({
+        url: HISTORY_API,
+        headers: authHeaders(),
+        type: 'GET',
+        success: function (entries) { renderHistory(entries || []); },
+        error: function () {
+          $('#history-grid').empty();
+          $('#history-empty').prop('hidden', true);
+          showHistoryError('Could not load your saved calculations.');
+        }
+      });
+    }
+
+    function modalRow(label, value, unit, dp) {
+      var cell = '<td>' + fmtNum(value, dp) + (unit ? ' <span class="hm-unit">' + unit + '</span>' : '') + '</td>';
+      return '<tr><td>' + label + '</td>' + cell + '</tr>';
+    }
+    function modalBlock(title, rows) {
+      return '<div class="history-modal-block"><h5>' + title + '</h5>' +
+        '<table class="history-modal-table">' + rows + '</table></div>';
+    }
+
+    function openHistoryDetail(entry) {
+      var inputs = entry.inputs || {};
+      var outputs = entry.outputs || {};
+      var isRect = isKnown(inputs.dw);
+      var body = $('#history-modal-body').empty();
+
+      body.append(
+        '<h4 class="history-modal-title">' + (isRect ? 'Rectangular duct' : 'Circular duct') + '</h4>' +
+        '<div class="history-modal-time">' + fmtTime(entry.created_at) + '</div>'
+      );
+
+      var inputRows = '';
+      if (isKnown(inputs.flowrate)) { inputRows += modalRow('Flow rate', inputs.flowrate, 'L/s', 0); }
+      if (isKnown(inputs.dia)) { inputRows += modalRow('Diameter', inputs.dia, 'mm', 0); }
+      if (isKnown(inputs.hl)) { inputRows += modalRow('Head loss', inputs.hl, 'Pa/m', 3); }
+      if (isKnown(inputs.vel)) { inputRows += modalRow('Velocity', inputs.vel, 'm/s', 2); }
+      if (isRect) {
+        inputRows += modalRow('Duct width', inputs.dw, 'mm', 0);
+        inputRows += modalRow('Duct height', outputs.dh, 'mm', 0);
+      }
+      body.append(modalBlock('Inputs', inputRows));
+
+      var resultRows = '';
+      resultRows += modalRow('Equivalent diameter', outputs.ed, 'mm', 1);
+      resultRows += modalRow('Flow area', outputs.fa, 'm²', 3);
+      resultRows += modalRow('Fluid velocity', outputs.fv, 'm/s', 2);
+      resultRows += modalRow('Reynolds number', outputs.rn, '', 0);
+      resultRows += modalRow('Friction factor', outputs.ff, '', 4);
+      resultRows += modalRow('Velocity pressure', outputs.vp, 'Pa', 2);
+      resultRows += modalRow('Head loss', outputs.hl, 'Pa/m', 3);
+      body.append(modalBlock('Results', resultRows));
+
+      $('#history-modal').prop('hidden', false);
+    }
+
+    function closeHistoryDetail() {
+      $('#history-modal').prop('hidden', true);
+      $('#history-modal-body').empty();
+    }
+
+    function deleteHistoryEntry(id, card) {
+      card.addClass('history-card-deleting');
+      $.ajax({
+        url: HISTORY_API + id + '/',
+        headers: authHeaders(),
+        type: 'DELETE',
+        success: function () {
+          card.remove();
+          var count = $('#history-grid').children('.history-card').length;
+          $('#history-empty').prop('hidden', count !== 0);
+          $('#history-note').text(count ? count + ' saved' : '');
+        },
+        error: function (xhr) {
+          card.removeClass('history-card-deleting');
+          showHistoryError(xhr.status === 404
+            ? 'That entry is already gone.'
+            : 'Could not delete that entry.');
+        }
+      });
+    }
+
+    // Delegated clicks: the card body opens the detail overlay, the × deletes.
+    // Enter/Space on a card opens it too for keyboard users.
+    $('#history-grid').on('click', '.history-card', function (e) {
+      if ($(e.target).closest('.history-card-del').length) { return; }
+      openHistoryDetail($(this).data('entry'));
+    });
+    $('#history-grid').on('keydown', '.history-card', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openHistoryDetail($(this).data('entry'));
+      }
+    });
+    $('#history-grid').on('click', '.history-card-del', function (e) {
+      e.stopPropagation();
+      var card = $(this).closest('.history-card');
+      deleteHistoryEntry(card.data('id'), card);
+    });
+    // Any click outside the detail card, the close button, or Escape dismisses.
+    $('#history-modal').on('click', function (e) {
+      if (e.target === this || $(e.target).closest('.history-modal-close').length) {
+        closeHistoryDetail();
+      }
+    });
+    $(document).on('keydown', function (e) {
+      if (e.key === 'Escape') { closeHistoryDetail(); }
+    });
+
+    // Refresh the grid when the site-wide auth state flips (login/logout on
+    // the page), and once on load. No token → the section stays hidden.
+    function handleHistoryAuth() {
+      if (readAuthToken()) { loadHistory(); } else { hideHistory(); }
+    }
+    var lastAuthState = document.documentElement.dataset.authState;
+    var authObserver = new MutationObserver(function () {
+      var state = document.documentElement.dataset.authState;
+      if (state !== lastAuthState) { lastAuthState = state; handleHistoryAuth(); }
+    });
+    authObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-auth-state'] });
+    handleHistoryAuth();
   });

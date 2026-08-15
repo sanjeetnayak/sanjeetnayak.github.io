@@ -182,12 +182,31 @@
           </tbody>
         </table>
  
-      </div>        
+      </div>
     </div>
+
+    <!-- Saved calculation history — shown for signed-in users only -->
+    <section class="history-section" id="history-section" hidden>
+      <div class="history-head">
+        <h3>Recent Calculations</h3>
+        <span class="history-note" id="history-note"></span>
+      </div>
+      <div class="history-grid" id="history-grid"></div>
+      <p class="history-empty" id="history-empty" hidden>No saved calculations yet — run one above and it will appear here.</p>
+      <p class="history-error" id="history-error" hidden role="alert"></p>
+    </section>
 
 </div>
 </div>
 </main>
+</div>
+
+<!-- Full-result detail overlay, dismissed by clicking anywhere -->
+<div class="history-modal" id="history-modal" hidden>
+  <div class="history-modal-card" role="dialog" aria-modal="true" aria-label="Calculation details">
+    <button type="button" class="history-modal-close" aria-label="Close">&times;</button>
+    <div id="history-modal-body"></div>
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
