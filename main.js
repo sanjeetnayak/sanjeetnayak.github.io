@@ -2,7 +2,7 @@
   const storageKey = 'siteAuthToken';
   const userStorageKey = 'siteAuthUser';
   const storageType = window.AUTH_TOKEN_STORAGE || 'localStorage';
-  const authApiBase = (window.AUTH_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+  const authApiBase = (window.AUTH_API_BASE_URL || 'https://webcalc-backend.onrender.com').replace(/\/$/, '');
 
   function buildAuthUrl(path) {
     return `${authApiBase}${path.startsWith('/') ? path : `/${path}`}`;
