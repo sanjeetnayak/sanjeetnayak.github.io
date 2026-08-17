@@ -2,7 +2,8 @@
   const storageKey = 'siteAuthToken';
   const userStorageKey = 'siteAuthUser';
   const storageType = window.AUTH_TOKEN_STORAGE || 'localStorage';
-  const authApiBase = (window.AUTH_API_BASE_URL || 'https://webcalc-backend.onrender.com').replace(/\/$/, '');
+  const authApiBase = (window.AUTH_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+  const googleClientId = window.GOOGLE_CLIENT_ID || '831513932056-ojvqr4hph5tpbii70q5i9ab7sfc22v05.apps.googleusercontent.com';
 
   function buildAuthUrl(path) {
     return `${authApiBase}${path.startsWith('/') ? path : `/${path}`}`;
@@ -72,6 +73,7 @@
     clearToken();
     clearUserLabel();
     setAuthState(null, '');
+    closeAuthDropdowns(null);
     const shell = document.getElementById('auth-shell');
     if (shell) {
       renderAuthUi(null, '');
@@ -303,6 +305,8 @@
                       <button type="submit" class="btn btn-sm btn-primary">Login</button>
                     </div>
                   </form>
+                  <div class="auth-divider"><span>or continue with</span></div>
+                  <div id="auth-google-button" class="auth-google-button"></div>
                 </div>
 
                 <div class="auth-form-panel" data-auth-panel="register">
@@ -493,7 +497,7 @@
           const resolvedUserLabel = normalizeUserLabel(data, identifier);
           saveToken(token);
           saveUserLabel(resolvedUserLabel);
-          window.location.href = '/';
+          window.location.href = '/ductsizer/';
         } catch (error) {
           messageBox.textContent = error.message || 'Unable to reach the authentication service.';
           messageBox.className = 'auth-message auth-message-error';
@@ -543,13 +547,123 @@
           const resolvedUserLabel = normalizeUserLabel(data, identifier);
           saveToken(token);
           saveUserLabel(resolvedUserLabel);
-          window.location.href = '/';
+          window.location.href = '/ductsizer/';
         } catch (error) {
           messageBox.textContent = error.message || 'Unable to reach the authentication service.';
           messageBox.className = 'auth-message auth-message-error';
         }
       });
     }
+
+    initGoogleSignIn();
+  }
+
+  let googleInited = false;
+
+  function loadGsiScript() {
+    return new Promise((resolve, reject) => {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        resolve();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Google Sign-In script failed to load.'));
+      document.head.appendChild(script);
+    });
+  }
+
+  function decodeJwtPayload(token) {
+    try {
+      const part = String(token).split('.')[1];
+      if (!part) {
+        return null;
+      }
+      const base64 = part.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+      const json = decodeURIComponent(
+        atob(padded)
+          .split('')
+          .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
+          .join('')
+      );
+      return JSON.parse(json);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function handleGoogleCredential(response) {
+    const messageBox = document.getElementById('auth-message');
+    if (!response || !response.credential) {
+      if (messageBox) {
+        messageBox.textContent = 'Google sign-in was cancelled.';
+        messageBox.className = 'auth-message auth-message-error';
+      }
+      return;
+    }
+    try {
+      const res = await fetch(buildAuthUrl('/auth/google/'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        body: JSON.stringify({ id_token: response.credential })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || `Google sign-in failed (${res.status}).`);
+      }
+      const token = data.token || data.accessToken || data.data?.token;
+      if (!token) {
+        throw new Error('The server did not return an auth token.');
+      }
+      saveToken(token);
+      const claims = decodeJwtPayload(response.credential);
+      saveUserLabel((claims && claims.name) || normalizeUserLabel(data, ''));
+      window.location.href = '/ductsizer/';
+    } catch (error) {
+      if (messageBox) {
+        messageBox.textContent = error.message || 'Unable to reach the authentication service.';
+        messageBox.className = 'auth-message auth-message-error';
+      }
+    }
+  }
+
+  async function initGoogleSignIn() {
+    const container = document.getElementById('auth-google-button');
+    const formShell = document.getElementById('auth-form-shell');
+    if (!container || !formShell || formShell.classList.contains('auth-hidden')) {
+      return;
+    }
+    container.innerHTML = '';
+    const divider = container.previousElementSibling;
+    try {
+      await loadGsiScript();
+    } catch (error) {
+      if (divider) {
+        divider.style.display = 'none';
+      }
+      container.style.display = 'none';
+      return;
+    }
+    if (!googleInited) {
+      google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleGoogleCredential
+      });
+      googleInited = true;
+    }
+    google.accounts.id.renderButton(container, {
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      shape: 'pill',
+      logo_alignment: 'left',
+      width: '100%'
+    });
   }
 
   window.authFetch = async function authFetch(url, options = {}) {

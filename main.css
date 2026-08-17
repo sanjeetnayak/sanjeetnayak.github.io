@@ -787,6 +787,28 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 8px;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.auth-google-button {
+  width: 100%;
+}
+
 .auth-message {
   font-size: 13px;
   min-height: 20px;
