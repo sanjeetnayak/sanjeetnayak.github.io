@@ -71,17 +71,18 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   width: 38px;
   height: 38px;
+  padding: 0;
   border-radius: 10px;
-  background: var(--accent);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.02em;
+  overflow: hidden;
+}
+.site-header .navbar-brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .site-header .navbar-brand:hover {
-  background: var(--accent-strong);
+  opacity: 0.85;
 }
 
 .site-header .navbar-nav {
@@ -809,6 +810,17 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
 }
 
+.auth-google-button *,
+.auth-google-button *:focus,
+.auth-google-button *:focus-visible,
+.auth-google-button *:active,
+.auth-google-button:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.auth-google-button iframe {
+  border: none !important;
+}
 .auth-message {
   font-size: 13px;
   min-height: 20px;
@@ -918,4 +930,34 @@ h1, h2, h3, h4, h5, h6 {
   .auth-hero.to-login .auth-side {
     animation: none;
   }
+}
+
+/* --------------------------------------------------------------------------
+   Global overrides — kill Bootstrap focus ring + number-input spinners
+   -------------------------------------------------------------------------- */
+.btn:focus,
+.btn-primary:focus,
+.btn-dark:focus,
+.btn-outline-secondary:focus,
+.btn-outline-light:focus,
+.form-control:focus,
+.form-check-input:focus + .form-check-label,
+.input-group-text:focus,
+select.form-control:focus,
+.auth-mode-btn:focus,
+.auth-mode-btn:active,
+button:focus,
+a:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }

@@ -1,0 +1,24 @@
+name: Auto-Sync Upstream Fork
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Runs every hour at minute 0 (in UTC time)
+  workflow_dispatch: # Allows manual trigger from the Actions tab
+
+jobs:
+  sync_latest_from_upstream:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to commit and push changes back to your fork
+      
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+
+      - name: Sync upstream changes
+        uses: dabreadman/sync-upstream-repo@v1.3.0
+        with:
+          upstream_repo: 'https://github.com/sanjeetnayak/sanjeetnayak.github.io'
+          upstream_branch: 'main'
+          downstream_branch: 'main'
+          token: ${{ secrets.GITHUB_TOKEN }}

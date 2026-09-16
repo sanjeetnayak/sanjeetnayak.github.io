@@ -43,8 +43,26 @@
     </form>
     </div>
   </div>
+
+    <!-- <section class="tool-intro" aria-label="About DuctSizer and how to use it">
+      <div class="tool-intro-copy">
+        <p class="tool-intro-eyebrow">DuctSizer</p>
+        <p class="tool-intro-text">
+          Sizes HVAC duct runs from the Darcy–Weisbach equation. Check any
+          <strong>two</strong> of flow, head loss, velocity and diameter — it
+          solves the other two and returns the duct size, Reynolds number,
+          friction factor and more, in SI or US units.
+        </p>
+      </div>
+      <ol class="tool-intro-steps">
+        <li>Check the two quantities you know</li>
+        <li>Pick SI or US units</li>
+        <li>Calculate, then refine to a rectangular duct</li>
+      </ol>
+    </section> -->
+
     <div class="row calc-row pane-closed">
-      <div class="col-md-6 mt-3 shadow-lg p-3 mb-5 bg-white rounded">
+      <div class="col-md-6 calc-col mt-3 shadow-lg p-3 mb-3 mb-md-5 bg-white rounded">
         <form id="myform" method="POST">
             <label for="inputFlow">Flow Rate</label>
               <div class="input-group" style="margin-bottom: 1rem;">
@@ -114,11 +132,34 @@
                 <p class="calc-alert" id="calc-alert" hidden role="alert"></p>
           </form>
       </div>
-      <div class="results-pane col-md-6 mt-3 shadow-lg p-3 mb-5 bg-white rounded">
+      <div class="results-pane col-md-6 mt-3 shadow-lg p-3 mb-3 mb-md-5">
+        <section class="tool-intro" aria-label="About DuctSizer and how to use it">
+      <div class="tool-intro-copy">
+        <p class="tool-intro-eyebrow">DuctSizer</p>
+        <p class="tool-intro-text">
+          Sizes HVAC duct runs from the Darcy–Weisbach equation. Check any
+          <strong>two</strong> of flow, head loss, velocity and diameter — it
+          solves the other two and returns the duct size, Reynolds number,
+          friction factor and more, in SI or US units.
+        </p>
+      </div>
+      <ol class="tool-intro-steps">
+        <li>Check the two quantities you know</li>
+        <li>Pick SI or US units</li>
+        <li>Calculate, then refine to a rectangular duct</li>
+      </ol>
+          <!-- Clickable Animated Arrow Element -->
+    <div class="scroll-arrow-container">
+      <div class="arrow"></div>
+      <div class="scroll-text">Scroll Down <br>to use Duct sizer</div>
+    </div>
+
+  </section>
+        <div class="results-content">
         <form id="myform2" method="POST">
           <div class="form-row">
             <div class="col">
-              <label for="inputFlow">Duct Size</label>
+              <label for="inlineFormInput-1">Duct Size</label>
               <div class="input-group">
               <input type="number" class="form-control" id="inlineFormInput-1" placeholder="Width" disabled>
               <div class="input-group-append append" style="width: unset;" >
@@ -139,50 +180,71 @@
           </form>
         <table class="table" style="display:none">
           <tr style="visibility: collapse;">
-            <th style="width: 50%"></th>
+            <th style="width: 45%"></th>
             <th style="width: 25%"></th>
-            <th style="width: 25%"></th>
+            <th style="width: 20%"></th>
+            <th style="width: 10%"></th>
           </tr>
           <tbody>
             <tr>
               <td>Equivalent Diameter</td>
               <td class="dia"  id="ed" align="right"></td>
               <td class="unit">mm</td>
+              <td class="alarm-cell"></td>
             </tr>
             <tr>
               <td>Flow Area</td>
               <td class="fa1"  id="fa1" align="right"></td>
               <td class="unit">m<sup>2</sup></td>
+              <td class="alarm-cell"></td>
             </tr>
             <tr>
               <td>Fluid velocity</td>
               <td class="vel"  id="fv" align="right"></td>
               <td class="unit">m/sec</td>
+              <td class="alarm-cell"></td>
             </tr>
             <tr>
               <td>Reynolds Number</td>
               <td class="rn" id="rn" align="right"></td>
               <td></td>
+              <td class="alarm-cell"></td>
             </tr>
             <tr>
               <td>Friction factor</td>
               <td class="ff"  id="ff" align="right"></td>
               <td></td>
+              <td class="alarm-cell"></td>
             </tr>
             <tr>
               <td>Velocity Pressure</td>
               <td class="vp"  id="vp" align="right"></td>
               <td class="unit">Pa</td>
+              <td class="alarm-cell"></td>
             </tr>
             <tr>
               <td>Head Loss</td>
               <td class="hl"  id="hl" align="right"></td>
               <td class="unit">Pa/m</td>
+              <td class="alarm-cell"></td>
             </tr>
           </tbody>
         </table>
- 
+        <div id="alarm-area" class="alarm-area"></div>
+        <div id="aspect-ratio-banner" class="aspect-ratio-banner" hidden></div>
+        <div id="duct-suggestions" class="duct-suggestions" hidden></div>
+        </div>
+
       </div>
+    </div>
+
+    <!-- Sign-in prompt — shown to guests so their runs aren't silently lost -->
+    <div class="login-notice" id="login-notice" hidden>
+      <i class="fa fa-history login-notice-icon" aria-hidden="true"></i>
+      <p class="login-notice-text">
+        <strong>Not signed in.</strong> Your calculations won't be saved —
+        <a href="/login.html">sign in</a> to keep a history of your runs and revisit them later.
+      </p>
     </div>
 
     <!-- Saved calculation history — shown for signed-in users only -->

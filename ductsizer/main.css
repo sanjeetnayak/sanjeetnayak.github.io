@@ -108,38 +108,129 @@ input:checked + .slider:after {
   color: red;
 }
 
-/* Results pane: folded shut on arrival, opens like a page turning once results land */
-.calc-row {
+/* Stationary two-pane layout: results-pane (intro + results) always sits on
+   the left (desktop) / top (mobile) via CSS order; calc-col (input form)
+   stays fixed on the right / below. No column swapping. */
+.calc-row { display: flex; }
+.calc-row .results-pane { order: -1; }
+
+/* Mobile: after calculation, flip columns so input is on top, results below */
+@media (max-width: 767px) {
+  .calc-row.calc-active .calc-col { order: -1; }
+  .calc-row.calc-active .results-pane { order: 0; }
+}
+
+/* The results pane is always a visible dark card — a blank placeholder until a
+   calculation lands. The content inside is the page that turns in on submit. */
+.calc-row .results-pane {
   perspective: 2000px;
 }
 
-.calc-row .results-pane {
-  transform-origin: left center;
+.calc-row .results-content {
+  transform-origin: bottom center;
   transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
               opacity 0.85s ease;
 }
 
-.calc-row.pane-closed .results-pane {
-  transform: rotateY(-90deg);
+.calc-row.pane-closed .results-content {
+  transform: rotateX(-90deg);
   opacity: 0;
   visibility: hidden;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .calc-row .results-pane {
-    transition: none;
-  }
 }
 
 /* Error message shown when the calculator service can't answer */
 .calc-alert {
   margin: 14px 0 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
   padding: 10px 14px;
   font-size: 0.85rem;
   color: #b3261e;
   background: rgba(214, 60, 60, 0.1);
   border: 1px solid rgba(214, 60, 60, 0.35);
   border-radius: 9px;
+}
+
+/* --------------------------------------------------------------------------
+   Results pane — dark instrument readout, matching the tool-intro panel
+   -------------------------------------------------------------------------- */
+.results-pane {
+  background:
+    radial-gradient(520px 240px at 92% -25%, rgba(14, 140, 127, 0.2), transparent 60%),
+    var(--ink);
+  color: var(--on-dark);
+  border: 1px solid rgba(230, 236, 242, 0.12);
+  border-radius: var(--radius);
+  min-height: 240px; /* blank placeholder reads as a panel before any result */
+}
+
+.results-pane label {
+  color: var(--on-dark-muted);
+  font-size: 0.85rem;
+}
+
+.results-pane .form-control,
+.results-pane .input-group-text {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(230, 236, 242, 0.18);
+  color: var(--on-dark);
+}
+
+.results-pane .form-control::placeholder {
+  color: var(--on-dark-muted);
+  opacity: 0.75;
+}
+
+.results-pane .form-control:focus {
+  background-color: rgba(255, 255, 255, 0.09);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(14, 140, 127, 0.25);
+  color: var(--on-dark);
+}
+
+.results-pane .form-control:disabled {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(230, 236, 242, 0.12);
+  color: var(--on-dark-muted);
+  cursor: not-allowed;
+}
+
+.results-pane .table {
+  color: var(--on-dark);
+}
+
+.results-pane .table td {
+  border-top: 1px solid rgba(230, 236, 242, 0.12);
+  padding: 0.5rem 0;
+  vertical-align: middle;
+}
+
+.results-pane .table td:first-child {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+
+.results-pane .table td:nth-child(2) {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--on-dark);
+}
+
+.results-pane .table td:nth-child(3) {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--on-dark-muted);
+}
+
+.results-pane .table .dia {
+  color: var(--accent);
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
 /* --------------------------------------------------------------------------
@@ -414,7 +505,424 @@ input:checked + .slider:after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .history-card {
+  .history-card,
+  .tool-intro {
     transition: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Tool intro — what DuctSizer does and how to use it
+   -------------------------------------------------------------------------- */
+.tool-intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 32px;
+  margin: 10px 0 4px;
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  background:
+    radial-gradient(520px 240px at 92% -25%, rgba(14, 140, 127, 0.28), transparent 60%),
+    var(--ink);
+  color: var(--on-dark);
+  box-shadow: var(--shadow);
+
+  /* Acts as the cover page of the uncalculated calculator: once a result
+     lands it folds shut like a page turning, so the results own the view. */
+  transform-origin: top center;
+  overflow: hidden;
+  max-height: 320px; /* fixed cap so the fold/unfold is animatable */
+
+}
+
+.tool-intro.intro-closed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  transform: rotateX(-80deg);
+  visibility: hidden;
+  pointer-events: none;
+
+}
+
+.tool-intro-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 6px;
+}
+
+.tool-intro-text {
+  margin: 0;
+  max-width: 54ch;
+  font-size: 0.92rem;
+  color: var(--on-dark-muted);
+}
+
+.tool-intro-text strong {
+  color: var(--on-dark);
+}
+
+.tool-intro-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--on-dark-muted);
+}
+
+.tool-intro-steps li {
+  counter-increment: step;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.tool-intro-steps li::before {
+  content: counter(step);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Guest sign-in prompt (shown when not authenticated)
+   -------------------------------------------------------------------------- */
+.login-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+  padding: 12px 16px;
+  border: 1px dashed var(--accent);
+  border-radius: 12px;
+  background: var(--accent-soft);
+}
+
+.login-notice[hidden] {
+  display: none !important;
+}
+
+.login-notice-icon {
+  font-size: 1.15rem;
+  color: var(--accent-strong);
+}
+
+.login-notice-text {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.login-notice-text strong {
+  color: var(--ink-2);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — pull the calculator and its saved history together on small
+   screens. Stacked columns leave a large dead gap otherwise: the folded
+   results pane stays invisible but still holds layout space, on top of the
+   mb-5 / 44px margins.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  .tool-intro {
+    max-height: 420px; /* stacked steps need more room on small screens */
+  }
+
+  .history-section {
+    margin-top: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-intro,
+  .tool-intro.intro-closed {
+    transition: none; /* fold/unfold snaps shut instead of animating */
+  }
+}
+select {
+  /* Modern browsers */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  /* Internet Explorer 10+ */
+  &::-ms-expand {
+    display: none;
+  }
+}
+
+
+.duct-suggestions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin-top: 10px;
+  overflow-x: auto;
+}
+.duct-suggestions[hidden] { display: none !important; }
+.duct-suggestion {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(230, 236, 242, 0.18);
+  background: rgba(255,255,255,0.06);
+  color: var(--on-dark);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+  flex-shrink: 0;
+}
+.duct-suggestion:hover { background: rgba(14,140,127,0.18); border-color: var(--accent); }
+.duct-suggestion.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.duct-suggestion.best::before { content: "⭐"; font-size: 0.6rem; }
+.duct-suggestion .suggestion-label { font-size: 0.6rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em; }
+.duct-suggestion .suggestion-size { font-weight: 600; }
+
+.alarm-area { min-height: 28px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+
+/* --------------------------------------------------------------------------
+   Dot table — separate table for coloured alarm dots below results
+   -------------------------------------------------------------------------- */
+.dot-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+
+.dot-table td {
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  border: none;
+}
+
+.dot-table td:first-child {
+  width: 14px;
+  padding-right: 4px;
+  text-align: center;
+}
+
+.dot-table td:first-child::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-table td.alarm-warn:first-child::before {
+  background: var(--amber);
+}
+
+.dot-table td.alarm-crit:first-child::before {
+  background: #d63c3c;
+}
+
+.dot-table td.alarm-warn {
+  color: var(--amber);
+}
+
+.dot-table td.alarm-crit {
+  color: #d63c3c;
+}
+
+/* On low-width devices, show the dot table below the numbers */
+@media (max-width: 767px) {
+  .dot-table {
+    display: table;
+  }
+}
+
+/* On wider screens, the inline cell dots are enough — hide the table */
+@media (min-width: 768px) {
+  .dot-table {
+    display: none;
+  }
+}
+.alarm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.alarm-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.alarm-badge.alarm-warn { color: var(--amber); background: rgba(217,142,43,0.12); border: 1px solid rgba(217,142,43,0.3); }
+.alarm-badge.alarm-warn::before { background: var(--amber); }
+.alarm-badge.alarm-crit { color: #d63c3c; background: rgba(214,60,60,0.12); border: 1px solid rgba(214,60,60,0.3); }
+.alarm-badge.alarm-crit::before { background: #d63c3c; }
+
+/* --------------------------------------------------------------------------
+   Inline result-cell alarm dots — amber warn, red crit
+   -------------------------------------------------------------------------- */
+.results-pane .table td.alarm-warn,
+.results-pane .table td.alarm-crit {
+  position: relative;
+}
+
+.results-pane .table td.alarm-warn::after,
+.results-pane .table td.alarm-crit::after {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.results-pane .table td.alarm-warn::after {
+  background: var(--amber);
+}
+
+.results-pane .table td.alarm-crit::after {
+  background: #d63c3c;
+}
+
+/* Hover tooltip on flagged cells */
+.results-pane .table td.alarm-warn[title],
+.results-pane .table td.alarm-crit[title] {
+  cursor: help;
+}
+
+/* --------------------------------------------------------------------------
+   Aspect ratio banner — sits below W×H inputs in results pane
+   -------------------------------------------------------------------------- */
+.aspect-ratio-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aspect-ratio-banner[hidden] {
+  display: none !important;
+}
+
+.aspect-ratio-banner::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.aspect-ratio-banner.warn {
+  color: var(--amber);
+  background: rgba(217, 142, 43, 0.12);
+  border: 1px solid rgba(217, 142, 43, 0.3);
+}
+
+.aspect-ratio-banner.warn::before {
+  background: var(--amber);
+}
+
+.aspect-ratio-banner.crit {
+  color: #d63c3c;
+  background: rgba(214, 60, 60, 0.12);
+  border: 1px solid rgba(214, 60, 60, 0.3);
+}
+
+.aspect-ratio-banner.crit::before {
+  background: #d63c3c;
+}
+
+    /* --- ARROW CONTAINER & STYLING --- */
+    .scroll-arrow-container {
+      position: absolute;
+      bottom: 30px; /* Positions arrow near bottom of the screen */
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      text-decoration: none;
+      color: #ffffff;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .scroll-arrow-container:hover {
+      opacity: 1;
+    }
+
+    /* CSS Drawn Arrow (No image files or icon libraries needed) */
+    .arrow {
+      box-sizing: border-box;
+      height: 20px;
+      width: 20px;
+      border-style: solid;
+      border-color: white;
+      border-width: 0 4px 4px 0; /* Creates an L shape */
+      transform: rotate(45deg);  /* Rotates L shape into an arrow pointing down */
+      margin: 0 auto 8px auto;
+      
+      /* Links the animation defined below */
+      animation: bounce 2s infinite; 
+    }
+
+    .scroll-text {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* --- BOUNCE ANIMATION KEYFRAMES --- */
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) rotate(45deg);
+      }
+      40% {
+        transform: translateY(-15px) rotate(45deg); /* Moves up */
+      }
+      60% {
+        transform: translateY(-7px) rotate(45deg);  /* Minor secondary bounce */
+      }
+    }
+    @media (min-width: 768px) {
+      .scroll-arrow-container {
+        display: none;
+      }
+    }
