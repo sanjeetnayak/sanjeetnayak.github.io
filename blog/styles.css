@@ -1,0 +1,279 @@
+/* ==========================================================================
+   Blog Styles — Sanjeet Nayak
+   Matches site design system: dark navy, teal accent, clean cards & typography
+   ========================================================================== */
+
+.blog-hero {
+  position: relative;
+  background:
+    radial-gradient(1000px 520px at 85% -10%, rgba(14, 140, 127, 0.2), transparent 60%),
+    radial-gradient(760px 420px at -10% 115%, rgba(14, 140, 127, 0.1), transparent 60%),
+    var(--ink);
+  color: var(--on-dark);
+  padding: 64px 0 48px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(230, 236, 242, 0.08);
+}
+
+.blog-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(230, 236, 242, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230, 236, 242, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 90%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 90%);
+  pointer-events: none;
+}
+
+.blog-hero .container {
+  position: relative;
+  z-index: 1;
+}
+
+.blog-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.blog-hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.blog-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--on-dark);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.blog-hero-sub {
+  font-size: 1.05rem;
+  color: var(--on-dark-muted);
+  max-width: 62ch;
+  margin-bottom: 0;
+  line-height: 1.6;
+}
+
+/* Category filter badges */
+.blog-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.blog-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.blog-filter-pill:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.blog-filter-pill.active {
+  background: var(--ink);
+  color: #ffffff;
+  border-color: var(--ink);
+}
+
+/* Featured / Regular Article Cards */
+.blog-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.blog-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(13, 27, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+}
+
+.blog-card-badge-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.blog-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.blog-badge.featured {
+  background: rgba(217, 142, 43, 0.15);
+  color: #b86e14;
+}
+
+.blog-card-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 14px;
+  letter-spacing: -0.015em;
+}
+
+.blog-card-title a {
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.blog-card-title a:hover {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.blog-card-excerpt {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-bottom: 24px;
+  max-width: 82ch;
+}
+
+.blog-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.blog-card-meta i {
+  margin-right: 5px;
+  color: var(--accent);
+}
+
+.blog-card-meta time {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.blog-card-action {
+  margin-left: auto;
+}
+
+.blog-read-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+  text-decoration: none;
+  transition: gap 0.2s ease;
+}
+
+.blog-read-link:hover {
+  gap: 10px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Empty state / coming soon card */
+.blog-secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.blog-preview-placeholder {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.blog-preview-placeholder h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.blog-preview-placeholder p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .blog-card {
+    padding: 22px;
+  }
+  .blog-card-action {
+    margin-left: 0;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
