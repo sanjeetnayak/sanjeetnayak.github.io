@@ -111,7 +111,8 @@
   const NAV_LINKS = [
     { href: '/', label: 'Home' },
     { href: '/about/', label: 'About' },
-    { href: '/ductsizer/', label: 'DuctSizer' }
+    { href: '/ductsizer/', label: 'DuctSizer' },
+    { href: '/blog/', label: 'Blog' }
   ];
 
   function isActiveLink(href, path) {
