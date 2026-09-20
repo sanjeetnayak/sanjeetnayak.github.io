@@ -10,7 +10,7 @@
     radial-gradient(760px 420px at -10% 115%, rgba(14, 140, 127, 0.1), transparent 60%),
     var(--ink);
   color: var(--on-dark);
-  padding: 64px 0 48px;
+  padding: 10px 0 48px;
   overflow: hidden;
   border-bottom: 1px solid rgba(230, 236, 242, 0.08);
 }
