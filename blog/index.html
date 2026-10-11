@@ -58,7 +58,7 @@
       <div class="blog-feed">
 
         <!-- New Blog Post: How to Become a Better Man -->
-        <article class="blog-card">
+        <article class="blog-card" data-post-id="how-to-become-a-better-man" title="Click anywhere on card for quick summary">
           <div class="blog-card-badge-row">
             <span class="blog-badge featured"><i class="fa fa-star" aria-hidden="true"></i> Featured</span>
             <span class="blog-badge">Personal Growth</span>
@@ -92,10 +92,13 @@
               </a>
             </div>
           </div>
+          <div class="blog-card-hint">
+            <i class="fa fa-info-circle" aria-hidden="true"></i> Click card for quick summary
+          </div>
         </article>
 
         <!-- Highway Travel Guide -->
-        <article class="blog-card">
+        <article class="blog-card" data-post-id="long-road-trip-essentials" title="Click anywhere on card for quick summary">
           <div class="blog-card-badge-row">
             <span class="blog-badge">Highway Travel</span>
             <span class="blog-badge">Safety &amp; Gear</span>
@@ -129,6 +132,9 @@
               </a>
             </div>
           </div>
+          <div class="blog-card-hint">
+            <i class="fa fa-info-circle" aria-hidden="true"></i> Click card for quick summary
+          </div>
         </article>
 
       </div>
@@ -150,6 +156,31 @@
     </div>
   </main>
 
+  <!-- SUMMARY POPUP DIALOG -->
+  <dialog id="blogSummaryModal" class="blog-modal" aria-labelledby="modalBlogTitle">
+    <div class="blog-modal-wrap">
+      <div class="blog-modal-header">
+        <h3 id="modalBlogTitle">Article Summary</h3>
+        <button type="button" class="blog-modal-close" id="modalCloseBtn" aria-label="Close popup">&times;</button>
+      </div>
+
+      <div class="blog-modal-meta" id="modalBlogMeta">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="blog-modal-body" id="modalBlogBody">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="blog-modal-footer">
+        <button type="button" class="btn-modal-close" id="modalDismissBtn">Close</button>
+        <a href="#" id="modalBlogLink" class="btn-modal-read">
+          Read Full Article <i class="fa fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  </dialog>
+
   <footer class="site-footer">
     <div class="container">
       <span>© 2026 Sanjeet Kumar Nayak</span>
@@ -157,6 +188,109 @@
   </footer>
 
   <script src="../main.js"></script>
+  <script>
+    (function () {
+      const summaries = {
+        'how-to-become-a-better-man': {
+          title: 'How to Become a Better Man: 6 Habits That Build Real Character',
+          meta: '<span><i class="fa fa-calendar-o"></i> October 11, 2026</span><span><i class="fa fa-clock-o"></i> 12 min read</span><span><i class="fa fa-tag"></i> Personal Growth</span>',
+          url: 'how-to-become-a-better-man-blog.html',
+          summaryHtml: `
+            <p><strong>Overview:</strong> True maturity and strength are not about external optics, looking wealthy, or projecting dominance. They are forged through quiet integrity, consistent accountability, and disciplined self-governance when no one is watching.</p>
+            <p><strong>The 6 Foundational Habits:</strong></p>
+            <ul>
+              <li><strong>1. Govern Your Internal Weather:</strong> Be a shock absorber, not a live wire. Recognize that while you cannot prevent emotional surges, you are entirely responsible for preventing fallout onto innocent bystanders.</li>
+              <li><strong>2. Reliability:</strong> Keep your commitments even after the initial motivation fades. Trust is built through small, repeated actions.</li>
+              <li><strong>3. Freedom from Dependencies:</strong> Face boredom, stress, and loneliness directly without relying on compulsive escapism or distractions.</li>
+              <li><strong>4. Physical Capacity:</strong> Treat exercise and sleep as prerequisites for mental clarity, stress tolerance, and stamina.</li>
+              <li><strong>5. Constructive Honesty:</strong> Speak the truth with empathy. Never disguise cruelty or insults as "just being honest."</li>
+              <li><strong>6. Internal Self-Worth:</strong> Measure yourself against your own character and values rather than outsourcing confidence to external praise.</li>
+            </ul>
+            <p><strong>Core Takeaway:</strong> Audit your weaknesses honestly without slipping into self-hatred, pick one area to improve, and become someone who can depend on himself.</p>
+          `
+        },
+        'long-road-trip-essentials': {
+          title: 'Long Road Trip Essentials: What Indian Drivers Actually Recommend',
+          meta: '<span><i class="fa fa-calendar-o"></i> September 20, 2026</span><span><i class="fa fa-clock-o"></i> 10 min read</span><span><i class="fa fa-tag"></i> Highway Travel</span>',
+          url: 'long-road-trip-essentials-blog.html',
+          summaryHtml: `
+            <p><strong>Overview:</strong> A structured, practical highway handbook distilled from seasoned drivers navigating Indian national highways and expressways on 1,000–2,000 km cross-country road trips.</p>
+            <p><strong>Key Practical Priorities:</strong></p>
+            <ul>
+              <li><strong>Vehicle Readiness:</strong> Pre-flight fluid checks, brake pads, fresh wiper blades, aligned washer nozzles, and cold-tyre PSI checks.</li>
+              <li><strong>Emergency & Tyre Gear:</strong> Essential wired 12V tyre inflators (over battery ones), tubeless puncture repair kits, jump-start cables, and high-visibility reflective triangles.</li>
+              <li><strong>Surveillance & Evidence:</strong> Reliable dual/triple-channel dashcams with high-heat endurance to handle expressway claims and road disputes.</li>
+              <li><strong>Fatigue & Driving Habits:</strong> Starting by 5–6 AM, avoiding night driving after 10 PM, pulling over at the first yawn, and eliminating aggressive ego-driving.</li>
+              <li><strong>Navigation & Hydration:</strong> Offline map downloads (Google Maps / MapmyIndia), Fastag top-ups, ORS sachets, and ample drinking water.</li>
+            </ul>
+            <p><strong>Core Takeaway:</strong> Safety, visibility, and fatigue management are non-negotiable. Accessories never replace vehicle preparation and disciplined habits.</p>
+          `
+        }
+      };
+
+      const modal = document.getElementById('blogSummaryModal');
+      const modalTitle = document.getElementById('modalBlogTitle');
+      const modalMeta = document.getElementById('modalBlogMeta');
+      const modalBody = document.getElementById('modalBlogBody');
+      const modalLink = document.getElementById('modalBlogLink');
+      const closeBtn = document.getElementById('modalCloseBtn');
+      const dismissBtn = document.getElementById('modalDismissBtn');
+
+      function openModal(postKey) {
+        const data = summaries[postKey];
+        if (!data || !modal) return;
+
+        modalTitle.textContent = data.title;
+        modalMeta.innerHTML = data.meta;
+        modalBody.innerHTML = data.summaryHtml;
+        modalLink.href = data.url;
+
+        if (typeof modal.showModal === 'function') {
+          modal.showModal();
+        } else {
+          modal.setAttribute('open', '');
+        }
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        if (typeof modal.close === 'function') {
+          modal.close();
+        } else {
+          modal.removeAttribute('open');
+        }
+      }
+
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (dismissBtn) dismissBtn.addEventListener('click', closeModal);
+
+      // Close when clicking modal backdrop
+      if (modal) {
+        modal.addEventListener('click', function (e) {
+          const rect = modal.getBoundingClientRect();
+          const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+            rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+          if (!isInDialog) {
+            closeModal();
+          }
+        });
+      }
+
+      // Bind blog cards
+      document.querySelectorAll('.blog-card[data-post-id]').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+          // If clicked directly on title link or "Read full article" link, do not intercept
+          if (e.target.closest('a')) {
+            return;
+          }
+          const postId = card.getAttribute('data-post-id');
+          if (postId) {
+            openModal(postId);
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 
 </html>
